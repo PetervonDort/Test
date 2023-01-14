@@ -1,4 +1,5 @@
 import time
+import re
 from selenium import webdriver
 import sqlite3 ,locale
 #frome datetime import date
@@ -11,7 +12,7 @@ driver = webdriver.Chrome(service=service)
 
 class ClDatabase():
     def __init__(self):
-        connecting = sqlite3.connect("home/peter/Dokumente/datenbanken/boerseRechner.db")
+        connecting = sqlite3.connect("home/peter/Dokumente/Datenbanken/boerseRechner.db")
         pointer = connecting.cursor()
         sql_command="""
         CREATE TABLE IF NOT EXIST share_price(
@@ -28,16 +29,22 @@ class ClDatacollect():
         driver.switch_to.frame(1)
         driver.find_element(By.CSS_SELECTOR, ".start-focus").click()
         driver.switch_to.parent_frame()
+
     def meGrab(self):
         contList = []
+        helpList = []
         k =driver.find_elements(By.CLASS_NAME,"outer-spacing--xsmall-top")
         for r in k:
             contList.append((r.get_attribute("innerHTML")))
-        return (contList[3])
+        contList[3]=([float(s) for s in re.findall(r'-?\d+\.?\d*', contList[3])])
+        for r in contList[3]:
+            helpList.append(r)
+        return (helpList[0])
 
 
 
 #DataB = ClDatabase()
 
 DataCollector = ClDatacollect()
-print(DataCollector.meGrab())
+string = (DataCollector.meGrab())
+print(string)
