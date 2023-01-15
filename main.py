@@ -1,7 +1,7 @@
-import time
-import re
+import time,re
+from datetime import date
 from selenium import webdriver
-import sqlite3 ,locale
+import sqlite3, locale
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -11,18 +11,44 @@ service = Service(executable_path="./chromedriver")
 chrome_options = Options()
 chrome_options.add_argument("--headless")
 driver = webdriver.Chrome(service=service, options=chrome_options)
+aktuelleWoche = date.today().strftime("%W")
+aktuellerTag = date.today().strftime("%a")
+aktuelleStunde = time.strftime('%H')
+locale.setlocale(locale.LC_ALL, '')
+hour = int(aktuelleStunde)
+Price_Peak = 0
+Price_High = 0
+Price_Low = 0
+Down_Price = 0
 
 class ClDatabase():
     def __init__(self):
-        connecting = sqlite3.connect("home/peter/Dokumente/Datenbanken/boerseRechner.db")
-        pointer = connecting.cursor()
-        sql_command="""
-        CREATE TABLE IF NOT EXIST share_price(
-        Week TEXT(3),
+        connection =sqlite3.connect("/home/peter/Dokumente/Datenbanken/Rechner.db")
+        pointer = connection.cursor()
+        sql_commands =""" 
+        CREATE TABLE IF NOT EXISTS Kurse(
         Day TEXT(3),
-        Max_Price REAL(5)
+        Hour INT(2),
+        Minute TEXT(2),
+        Price REAL(5),
+        Price_Peak REAL(5),
+        Price_High REAL(5),
+        Price_Low REAL(5),
+        Down_Price REAL (5)      
         );"""
-        pointer.execute(sql_command)
+        pointer.execute(sql_commands)
+
+
+    def meKursupload(self,  Tag, Stunde, Minute,  Price,  Price_Peak, Price_High, Price_Low, Down_Price):
+        verbindung = sqlite3.connect("/home/peter/Dokumente/Datenbanken/Rechner.db")
+        zeiger = verbindung.cursor()
+        zeiger.execute( """
+        INSERT INTO Kurse VALUES(?,?,?,?,?,?,?,?)""",
+                        ( Tag, Stunde, Minute,  Price,  Price_Peak, Price_High, Price_Low, Down_Price))
+        verbindung.commit()
+        verbindung.close()
+
+
 
 class ClDatacollect():
     def __init__(self):
@@ -43,10 +69,18 @@ class ClDatacollect():
             helpList.append(r)
         return (helpList[0])
 
+    def meClose(self):
+        driver.close()
 
-
-#DataB = ClDatabase()
-
+DataB = ClDatabase()
 DataCollector = ClDatacollect()
-string = (DataCollector.meGrab())
-print(string)
+while hour >7 and hour <18:
+    aktuelleMinute = time.strftime('%M')
+    aktuelleStunde = time.strftime('%H')
+    hour = int(aktuelleStunde)
+    DataB.meKursupload(aktuellerTag, aktuelleStunde, aktuelleMinute, DataCollector.meGrab(), Price_Peak, Price_High, Price_Low, Down_Price )
+    string = (DataCollector.meGrab())
+
+    print(string)
+DataCollector.meClose()
+
