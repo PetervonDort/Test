@@ -2,13 +2,15 @@ import time
 import re
 from selenium import webdriver
 import sqlite3 ,locale
-#frome datetime import date
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 
 #Varibales
 service = Service(executable_path="./chromedriver")
-driver = webdriver.Chrome(service=service)
+chrome_options = Options()
+chrome_options.add_argument("--headless")
+driver = webdriver.Chrome(service=service, options=chrome_options)
 
 class ClDatabase():
     def __init__(self):
