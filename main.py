@@ -63,11 +63,11 @@ class ClDatacollect():
         helpList = []
         k =driver.find_elements(By.CLASS_NAME,"outer-spacing--xsmall-top")
         for r in k:
-            contList.append((r.get_attribute("innerHTML")))
-        contList[3]=([float(s) for s in re.findall(r'-?\d+\.?\d*', contList[3])])
-        for r in contList[3]:
-            helpList.append(r)
-        return (helpList[0])
+            contList.append(r)#(r.get_attribute("innerHTML"))
+        #contList[3]=([float(s) for s in re.findall(r'-?\d+\.?\d*', contList[3])])
+        #for r in contList[3]:
+         #   helpList.append(r)
+        return (contList[3])
 
     def meClose(self):
         driver.close()
@@ -78,8 +78,11 @@ while hour >7 and hour <18:
     aktuelleMinute = time.strftime('%M')
     aktuelleStunde = time.strftime('%H')
     hour = int(aktuelleStunde)
-    DataB.meKursupload(aktuellerTag, aktuelleStunde, aktuelleMinute, DataCollector.meGrab(), Price_Peak, Price_High, Price_Low, Down_Price )
+    Price_Peak =Price_Peak+1
+    #Price = DataCollector.meGrab()
+    #DataB.meKursupload(aktuellerTag, aktuelleStunde, aktuelleMinute,Price, Price_Peak, Price_High, Price_Low, Down_Price )
     string = (DataCollector.meGrab())
+    print(Price_Peak)
 
     print(string)
 DataCollector.meClose()
